@@ -55,8 +55,7 @@ const addEnseignant = (req,res,next)=>{
 
             
 
-       
-
+    
         // register.save()
         // .then(response=>{
         //     res.json({

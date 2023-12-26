@@ -8,7 +8,10 @@ import 'package:http/http.dart' as http;
 import 'package:frontend/constante/config.dart';
 import 'package:image_picker/image_picker.dart';
 
+import 'package:flutter_excel/excel.dart';
 
+import 'package:file_picker/file_picker.dart';
+import 'package:frontend/models/EtudiantModel.dart';
 class EtudiantController extends GetxController {
   TextEditingController nomCompletController = TextEditingController();
   TextEditingController cinController = TextEditingController();
@@ -143,6 +146,7 @@ class EtudiantController extends GetxController {
     }
   }
   //////////////////////
+
   Future<void> addEtudiant() async {
     var etudiant = EtudiantModel(
         nomComplet: nomCompletController.text,
@@ -152,50 +156,50 @@ class EtudiantController extends GetxController {
         email: emailController.text,
         filiere: filiere.value,
         photo: etudiantPhoto.value,
-        phone: phoneController.text);
+        phone: phoneController.text
+    );
 
-    // var response = await http.post(Uri.parse(storeEtud),
-    //     headers: {"Content-type": "application/json"},
-    //     body: jsonEncode(etudiant.toJson()));
+    var response = await http.post(Uri.parse(storeEtud),
+        headers: {"Content-type": "application/json"},
+        body: jsonEncode(etudiant.toJson()));
 
-    if (etudiantPhoto == null) {
-      // No file selected
-      return;
-    }
-
-    final url = Uri.parse('http://192.168.1.11:3000/etudiant/upload');
-    final request = http.MultipartRequest('POST', url)
-      ..files.add(
-        await http.MultipartFile.fromPath('file', etudiantPhoto.value),
-      )
-      ..fields['nomComplet'] = nomCompletController.text
-      ..fields['cin'] = cinController.text
-      ..fields['classe'] = classe.value
-      ..fields['numInsc'] = numInscController.text
-      ..fields['email'] = emailController.text
-      ..fields['filiere'] = filiere.value
-      ..fields['phone'] = phoneController.text;
-
-    try {
-      final response = await request.send();
-      if (response.statusCode == 201) {
-        print('File uploaded successfully!');
-      } else {
-        print('Failed to upload file. Status code: ${response.statusCode}');
-      }
-    } catch (error) {
-      print('Error uploading file: $error');
-    }
-
-    // var jsonResponse = jsonDecode(response.body);
-    // if (jsonResponse["status"]) {
-    //   print(jsonResponse["password"]);
-    //   sendEmail(jsonResponse["password"],emailController.text);
-    //   // _sendEmail(jsonResponse["password"]);
-    //   Get.back();
-    // } else {
-    //   print("something went wrong");
+    // if (etudiantPhoto == null) {
+    //   // No file selected
+    //   return;
     // }
+    //
+    // final url = Uri.parse('http://192.168.1.11:3000/etudiant/upload');
+    // final request = http.MultipartRequest('POST', url)
+    //   ..files.add(
+    //     await http.MultipartFile.fromPath('file', etudiantPhoto.value),
+    //   )
+    //   ..fields['nomComplet'] = nomCompletController.text
+    //   ..fields['cin'] = cinController.text
+    //   ..fields['classe'] = classe.value
+    //   ..fields['numInsc'] = numInscController.text
+    //   ..fields['email'] = emailController.text
+    //   ..fields['filiere'] = filiere.value
+    //   ..fields['phone'] = phoneController.text;
+    //
+    // try {
+    //   final response = await request.send();
+    //   if (response.statusCode == 201) {
+    //     print('File uploaded successfully!');
+    //   } else {
+    //     print('Failed to upload file. Status code: ${response.statusCode}');
+    //   }
+    // } catch (error) {
+    //   print('Error uploading file: $error');
+    // }
+
+    var jsonResponse = jsonDecode(response.body);
+    if (jsonResponse["status"]) {
+      print(jsonResponse["password"]);
+      sendEmail(jsonResponse["password"],emailController.text);
+      Get.back();
+    } else {
+      print("something went wrong");
+    }
   }
 
   Future<void> editEtudiant(id, BuildContext context) async {
@@ -245,7 +249,6 @@ class EtudiantController extends GetxController {
   Future<void> getEtudiants(BuildContext context) async {
     try {
       valid.value = false;
-      print("iniiinnnnnnnnnnn");
 
       var response = await http.get(Uri.parse(listEtudiants));
       print(response);
@@ -268,14 +271,12 @@ class EtudiantController extends GetxController {
     } catch (e) {
       valid.value = true;
       print(e);
-      print('////////////////////////');
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           backgroundColor: Colors.blue,
           content: Text(
             'Erreur de recupération des donées',
             style: TextStyle(color: Colors.white),
           )));
-      print('////////////////////////');
     }
   }
 
@@ -356,5 +357,69 @@ class EtudiantController extends GetxController {
     }
   }
 
+
+  String? file;
+  RxList<EtudiantModel> EtudiantList = <EtudiantModel>[].obs;
+
+
+  Future importFromExcel(BuildContext context) async {
+    EtudiantList = RxList<EtudiantModel>([]);
+
+    FilePickerResult? pickedFile = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['xlsx'],
+      allowMultiple: false,
+    );
+
+    file = pickedFile?.files.single.path;
+    var bytes = File(file!).readAsBytesSync();
+    var excel = Excel.decodeBytes(bytes);
+    for (var table in excel.tables.keys) {
+      for (var row in excel.tables[table]!.rows) {
+
+        EtudiantList.add(EtudiantModel(
+            nomComplet: row[0]?.value ?? "",
+            cin: row[1]?.value.toString() ?? "",
+            numInsc: row[2]?.value.toString() ?? "",
+            phone: row[3]?.value.toString() ?? "",
+            email: row[4]?.value.toString() ?? "",
+            filiere: row[5]?.value.toString() ?? "",
+            classe: row[6]?.value.toString() ?? "",
+            photo: ""
+        ));
+      }
+    }
+    EtudiantList.length;
+    print(EtudiantList);
+    for(int i=0; i<EtudiantList.length;i++){
+      try{
+        var response =  await http.post(Uri.parse(storeEtud),
+            headers: {"Content-type":"application/json"},
+            body: jsonEncode(EtudiantList[i].toJson()));
+        print(response.body);
+
+        var jsonResponse = jsonDecode(response.body);
+
+        if(jsonResponse["status"]){
+          sendEmail(jsonResponse["password"],EtudiantList[i].email!);
+          Get.back();
+        }
+
+        else{
+          print("something went wrong");
+        }
+      }catch(e){
+        ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+                backgroundColor: Colors.blue,
+                content:Text("Une erreur est survenue lors de la sauvegarde des données.",
+                  style: TextStyle(color: Colors.white),)
+            )
+        );
+        print(e);
+      }
+    }
+
+  }
 }
 

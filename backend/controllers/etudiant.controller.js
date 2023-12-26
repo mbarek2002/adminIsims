@@ -21,16 +21,16 @@ const upload = multer({
 const addEtudiantnew = async (req, res) => {
     try {
         const randomPassword = generateRandomPassword(12);
-        console.log(req.file)
+        console.log(req.body)
 
-        if (req.fileValidationError) {
-            return res.status(400).json({
-                status: false,
-                message: req.fileValidationError,
-            });
-        }
+        // if (req.fileValidationError) {
+        //     return res.status(400).json({
+        //         status: false,
+        //         message: req.fileValidationError,
+        //     });
+        // }
 
-        const mimetype = req.file.mimetype ;
+        // const mimetype = req.file.mimetype ;
 
         const register = new userModel({
             nomComplet: req.body.nomComplet,
@@ -41,11 +41,11 @@ const addEtudiantnew = async (req, res) => {
             filiere: req.body.filiere,
             classe: req.body.classe,
             role: 'etudiant',
-            photoName:req.file.filename,
-            photo: {
-                data:req.file.filename,
-                contentType: mimetype,
-            },
+            // photoName:req.file.filename,
+            // photo: {
+            //     data:req.file.filename,
+            //     contentType: mimetype,
+            // },
         });
 
         const savedUser = await register.save(randomPassword);

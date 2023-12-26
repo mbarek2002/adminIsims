@@ -50,11 +50,8 @@ class _ListEnseigEtudPageState extends State<ListEnseigEtudPage> {
                               color:etudiantController.selectedList==1?Colors.white:Colors.blue,
                               fontSize: 20)),
                           onPressed: (){
-                            print("liste1");
                             etudiantController.selectedList.value=1;
-
-                            print(etudiantController.selectedList);
-                          },
+                            },
                         ),
                       ),
                       Container(
@@ -68,9 +65,7 @@ class _ListEnseigEtudPageState extends State<ListEnseigEtudPage> {
                                   color:etudiantController.selectedList==1?Colors.blue:Colors.white,
                                   fontSize: 20)),
                           onPressed: (){
-                            print("liste2");
                             etudiantController.selectedList.value=2;
-                            print(etudiantController.selectedList.value);
                           },
                         ),
                       ),
@@ -85,6 +80,7 @@ class _ListEnseigEtudPageState extends State<ListEnseigEtudPage> {
                       return  etudiantController.selectedList.value==1
                       ?etudiantController.getEtudiants(context)
                       :enseignantController.getEnseignants(context);
+
                     },
                     child: etudiantController.valid.value?
                         ListView.builder(
@@ -92,7 +88,7 @@ class _ListEnseigEtudPageState extends State<ListEnseigEtudPage> {
                               ?etudiantController.etudiantList?.length
                           :enseignantController.enseignantList?.length,
                           itemBuilder: (context,index){
-                        return  ListTile(
+                          return  ListTile(
                           title: Text(
                               etudiantController.selectedList.value==1
                               ?etudiantController.etudiantList![index]['nomComplet']

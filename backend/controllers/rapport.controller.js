@@ -20,11 +20,7 @@ exports.updateRapport = async (req,res,next)=>{
         let id=req.body._id;
         let rapport = rapportModel({
             _id:id,
-            id:req.body.id,
-            rapportType:req.body.rapportType,
-            rapportContent:req.body.rapportContent,
-            rapportStatus:req.body.rapportStatus,
-            seen:req.body.seen
+            rapportStatus:req.body.status,
         })
         console.log(rapport);
 

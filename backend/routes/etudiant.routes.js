@@ -6,8 +6,6 @@ const Storage = multer.diskStorage({
   destination:'uploads',
   filename:(req,file,cb)=>{
       cb(null,file.originalname);
-      console.log(file);
-      console.log(req.body);
   }
 })
 
@@ -17,7 +15,9 @@ const upload = multer({
 
 const etudiantController = require('../controllers/etudiant.controller');
 
-router.post('/storeEtudiant', upload, etudiantController.addEtudiantnew);
+// router.post('/storeEtudiant', upload, etudiantController.addEtudiantnew);
+router.post('/storeEtudiant', etudiantController.addEtudiantnew);
+
 router.get('/getEtudiants',etudiantController.getEtudiants);
 router.post('/deleteEtudiant',etudiantController.deleteEtudiant);
 router.post('/editEtudiant',etudiantController.editEtudiant)

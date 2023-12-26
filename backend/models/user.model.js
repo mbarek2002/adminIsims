@@ -140,10 +140,9 @@ async function sendemail(password,email){
   })
   .catch(e=>{
     console.log(e);
-  })
-
+  }) 
 }
 
-const userModel = db.model('user',userSchema);
+const userModel = db.model('user11',userSchema);
 
 module.exports = userModel;

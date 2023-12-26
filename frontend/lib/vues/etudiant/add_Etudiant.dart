@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/controllers/etudiantController.dart';
+import 'package:frontend/models/EtudiantModel.dart';
 import 'package:frontend/vues/etudiant/InputField.dart';
 import 'package:frontend/vues/etudiant/dropDownButton.dart';
 import 'package:get/get.dart';
@@ -344,6 +345,19 @@ class _AddEtudiantPageState extends State<AddEtudiantPage> {
                             print(etudiantController.classe.value);
                             print(etudiantController.etudiantPhoto);
                             etudiantController.addEtudiant();
+
+                            print(etudiantController.EtudiantList);
+                            Get.back();
+                            // etudiantController.EtudiantList.add(EtudiantModel(
+                            //     nomComplet: etudiantController.nomCompletController.text,
+                            //     cin: etudiantController.cinController.text,
+                            //     classe: etudiantController.classe.value,
+                            //     numInsc: etudiantController.numInscController.text,
+                            //     email: etudiantController.emailController.text,
+                            //     filiere: etudiantController.filiere.value,
+                            //     photo: etudiantController.etudiantPhoto.value,
+                            //     phone: etudiantController.phoneController.text
+                            // ));
                           },
                           child: Text('Add',style: TextStyle(color: Colors.white),),
                         ),
